@@ -1,0 +1,141 @@
+create database project_mangment;
+DROP TABLE IF EXISTS task;
+DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS project;
+DROP TABLE IF EXISTS company;
+DROP TABLE IF EXISTS owner;
+
+CREATE TABLE owner (
+    UniqueID INT PRIMARY KEY,
+    user_name VARCHAR(10) not null unique ,
+    full_name varchar(20),
+    address VARCHAR(50),
+    email VARCHAR(25) not null unique ,
+    phone VARCHAR(50) not null unique ,
+    gender VARCHAR(10) not null check ( gender='f'or gender='m' ),
+    dob DATE not null ,
+    age VARCHAR(10) ,
+    creation_at DATE default current_date
+);
+
+CREATE TABLE company (
+    UniqueID INT PRIMARY KEY,
+    address varchar(50) not null ,
+    name VARCHAR(50) not null unique ,
+    description VARCHAR(255),
+    industry VARCHAR(50),
+    company_type VARCHAR(50) ,
+    number_of_employees INT,
+    website VARCHAR(150) not null unique ,
+    founded_date DATE not null ,
+    creation_at DATE default current_date
+);
+
+CREATE TABLE project (
+    UniqueID INT PRIMARY KEY,
+    title VARCHAR(40) not null unique ,
+    description VARCHAR(255) not null ,
+    field VARCHAR(50) not null ,
+    start_date DATE not null ,
+    due_date DATE not null ,
+    status VARCHAR(50) check ( status='inProgress'or status='hold'or status='completed' ),
+    creation_at DATE default current_date,
+    owner INT,
+    company INT,
+    FOREIGN KEY (owner) REFERENCES owner(UniqueID),
+    FOREIGN KEY (company) REFERENCES company(UniqueID)
+);
+
+CREATE TABLE employee (
+    UniqueID INT PRIMARY KEY,
+    position VARCHAR(20) not null ,
+    access VARCHAR(20) not null ,
+    hire_date DATE not null ,
+    leave_balance DOUBLE default 0,
+    user_name VARCHAR(20) not null unique ,
+    address VARCHAR(20),
+    email VARCHAR(40) not null unique ,
+    phone VARCHAR(50) not null unique ,
+    gender VARCHAR(10) check ( gender='f'or gender='m' ),
+    dob DATE not null ,
+    age int,
+    creation_at DATE default current_date,
+    active VARCHAR(10) check ( active='active'or active='Leave'or active='Terminated' ),
+    project_id INT,
+    company_id INT,
+    FOREIGN KEY (project_id) REFERENCES project(UniqueID),
+    FOREIGN KEY (company_id) REFERENCES company(UniqueID)
+);
+
+CREATE TABLE task (
+    UniqueID INT PRIMARY KEY,
+    title VARCHAR(50) not null unique ,
+    description VARCHAR(255) not null ,
+    start_date DATE not null ,
+    due_date DATE not null ,
+    status VARCHAR(50) check ( status='Not Started'or status='Not Started'or status='In Progress'or status='Completed'or status='challenge' ),
+    creation_at DATE default current_date,
+    project_id INT,
+    assigned_to_id INT,
+    FOREIGN KEY (project_id) REFERENCES project(UniqueID),
+    FOREIGN KEY (assigned_to_id) REFERENCES employee(UniqueID)
+);
+
+#  Owner Table
+INSERT INTO owner VALUES (1, 'ali123', 'Ali Alharbi', 'Riyadh', 'ali.harbi@example.com', '0551234567', 'm', '1990-02-15', '33', '2023-11-28');
+INSERT INTO owner VALUES (2, 'sara22', 'Sara Alqahtani', 'Jeddah', 'sara.qahtani@example.com', '0562345678', 'f', '1985-06-25', '38', '2023-11-28');
+INSERT INTO owner VALUES (3, 'fahad01', 'Fahad Almalki', 'Dammam', 'fahad.malki@example.com', '0573456789', 'm', '1993-01-10', '30', '2023-11-28');
+INSERT INTO owner VALUES (4, 'nora45', 'Nora Alshehri', 'Abha', 'nora.shehri@example.com', '0584567890', 'f', '1992-08-20', '31', '2023-11-28');
+
+# Company Table
+INSERT INTO company VALUES (1, 'Riyadh, KSA', 'TechVision', 'A top tech company in Saudi Arabia', 'Technology', 'Private', 200, 'http://techvision.com', '2015-05-10', '2023-11-28');
+INSERT INTO company VALUES (2, 'Jeddah, KSA', 'HealthFirst', 'Healthcare provider in the region', 'Healthcare', 'Public', 1000, 'http://healthfirst.com', '2005-09-15', '2023-11-28');
+INSERT INTO company VALUES (3, 'Dammam, KSA', 'EnergyCorp', 'Leading energy solutions company', 'Energy', 'Private', 500, 'http://energycorp.com', '2010-03-20', '2023-11-28');
+INSERT INTO company VALUES (4, 'Abha, KSA', 'EduCare', 'Innovative educational services', 'Education', 'Private', 150, 'http://educare.com', '2018-07-01', '2023-11-28');
+
+#  Project Table
+INSERT INTO project VALUES (1, 'E-Learning System', 'Building an online education platform', 'Education', '2023-01-01', '2023-12-31', 'inProgress', '2023-11-28', 1, 4);
+INSERT INTO project VALUES (2, 'Hospital Management', 'Developing a hospital management system', 'Healthcare', '2023-06-01', '2024-05-31', 'hold', '2023-11-28', 2, 2);
+INSERT INTO project VALUES (3, 'Energy Monitoring', 'Implementing IoT for energy monitoring', 'Energy', '2023-03-15', '2023-11-30', 'completed', '2023-11-28', 3, 3);
+INSERT INTO project VALUES (4, 'AI Chatbot', 'Developing an AI-powered chatbot', 'Technology', '2023-08-01', '2024-07-31', 'inProgress', '2023-11-28', 4, 1);
+
+# Employee Table
+INSERT INTO employee VALUES (1, 'Software Engineer', 'Full', '2021-05-10', 15.5, 'eng_ali', 'Riyadh', 'ali.eng@example.com', '0559876543', 'm', '1992-07-01', 31, '2023-11-28', 'active', 1, 1);
+INSERT INTO employee VALUES (2, 'Product Manager', 'Full', '2019-02-20', 25.0, 'mgr_sara', 'Jeddah', 'sara.mgr@example.com', '0568765432', 'f', '1988-11-15', 35, '2023-11-28', 'active', 2, 2);
+INSERT INTO employee VALUES (3, 'Data Analyst', 'Restricted', '2022-01-15', 10.0, 'analyst_fahad', 'Dammam', 'fahad.analyst@example.com', '0577654321', 'm', '1994-03-05', 29, '2023-11-28', 'active', 3, 3);
+INSERT INTO employee VALUES (4, 'HR Specialist', 'Full', '2020-07-25', 18.0, 'hr_nora', 'Abha', 'nora.hr@example.com', '0586543210', 'f', '1990-06-20', 33, '2023-11-28', 'active', 4, 4);
+
+# Task Table
+INSERT INTO task VALUES (1, 'Design Wireframes', 'Create wireframes for the platform', '2023-02-01', '2023-03-01', 'Completed', '2023-11-28', 1, 1);
+INSERT INTO task VALUES (2, 'Database Setup', 'Set up the database schema', '2023-07-01', '2023-08-01', 'In Progress', '2023-11-28', 2, 2);
+INSERT INTO task VALUES (3, 'Energy Data Analysis', 'Analyze energy consumption data', '2023-03-20', '2023-04-20', 'Completed', '2023-11-28', 3, 3);
+INSERT INTO task VALUES (4, 'Chatbot Testing', 'Test AI chatbot features', '2023-08-15', '2023-09-15', 'Not Started', '2023-11-28', 4, 4);
+
+
+
+SELECT * FROM project WHERE status = 'inProgress';
+SELECT * FROM employee WHERE leave_balance >= 10;
+SELECT * FROM company WHERE industry='HealthCare';
+
+UPDATE company
+SET number_of_employees = 150
+WHERE UniqueID = 1;
+
+UPDATE employee
+SET leave_balance = leave_balance + 5
+WHERE UniqueID = 1;
+
+UPDATE task
+SET status = 'Completed'
+WHERE UniqueID = 1;
+
+DELETE FROM task
+WHERE UniqueID = 1;
+
+DELETE FROM employee
+WHERE UniqueID = 1;
+
+DELETE FROM project
+WHERE UniqueID = 1;
+
+
